@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel, Field
 from mcp.server.fastmcp import FastMCP
 
-from ..search import GoogleSearch, SearchResultEntry
+from ..search import SearchResultEntry, create_search_client
 
 router = APIRouter(prefix="/search", tags=["search"])
 
@@ -26,12 +26,12 @@ class SearchResult(BaseModel):
 )
 async def search_web_pages(request: SearchRequest) -> SearchResult:
     """
-    Search the web using Google Custom Search API to find relevant pages.
+    Search the web using the configured search provider (Google CSE or Brave Search).
 
     Returns search results with URLs, titles, and snippets that can be used
     with the fetch_web_content tool to get full page content.
     """
-    search_engine = GoogleSearch(request.query)
+    search_engine = create_search_client(request.query)
     res = await search_engine.search(max_results=request.max_results)
     return SearchResult(results=res if res is not None else [])
 

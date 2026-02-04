@@ -18,7 +18,7 @@ from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
 from langchain_core.runnables import Runnable
 from langchain_core.tools import tool, BaseTool
 
-from ..search import GoogleSearch, SearchResultEntry
+from ..search import SearchResultEntry, create_search_client
 from .web_content_analyzer import WebContentAnalyzer, AnalyzeRequest
 from ..config import get_config_manager
 
@@ -337,7 +337,7 @@ Always be strategic about your actions and aim for high-quality, comprehensive a
             # Check for cancellation before starting search
             await asyncio.sleep(0)
 
-            search = GoogleSearch(query=query, query_domains=query_domains)
+            search = create_search_client(query, query_domains=query_domains)
             results = await search.search(max_results=max_results)
             return results or []
         except asyncio.CancelledError:

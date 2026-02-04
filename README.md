@@ -5,7 +5,7 @@ A Model Context Protocol (MCP) server for web browsing, content extraction, and 
 ## Features
 
 - **Web Content Extraction**: Headless browser automation using Patchright
-- **Google Custom Search**: Integration with Google Custom Search API  
+- **Brave Search**: Web search via Brave Search API
 - **AI-Powered Analysis**: Multi-provider AI content analysis (OpenAI, OpenAI-compatible, Anthropic, etc.)
 - **Intelligent Caching**: SQLite-based caching with automatic cleanup
 - **Docker Ready**: Full containerized setup with VNC debugging
@@ -52,7 +52,7 @@ Copy `.env.example` to `.env` and configure your API keys. See `config.yaml` for
 ## MCP Tools
 
 - `fetch_web_content`: Extract content from web pages
-- `search_web_pages`: Search using Google Custom Search  
+- `search_web_pages`: Search using Brave Search API
 - `agent_websearch`: Intelligent iterative search with multi-step reasoning
 - `agent_extract_content`: AI-powered content extraction and analysis
 
@@ -60,7 +60,7 @@ Copy `.env.example` to `.env` and configure your API keys. See `config.yaml` for
 
 - Python 3.13+
 - Docker (recommended)
-- Google Custom Search API credentials
+- Brave Search API key
 - AI provider API key (OpenAI, Anthropic, etc.)
 - Firefox ESR (handled automatically in Docker)
 
