@@ -4,9 +4,9 @@ import os
 import urllib.parse
 import aiohttp
 import logging
+import textwrap
 
 from pydantic import BaseModel, Field
-import urllib
 
 logger = logging.getLogger(__name__)
 
@@ -89,10 +89,7 @@ class GoogleSearch:
                 search_query = f"({domain_query}) {self.query}"
 
         encoded_query = urllib.parse.quote_plus(search_query)
-        logger.info(
-            f"Google CSE searching for: {search_query!r}",
-            extra={"query": search_query},
-        )
+        logger.info(f"Google CSE searching for: {search_query!r}")
 
         res = []
         try:
@@ -112,72 +109,71 @@ class GoogleSearch:
                     )
 
                     logger.debug(
-                        f"Requesting Google CSE page {page + 1}, start={start_index}",
-                        extra={
-                            "query": self.query,
-                            "page": page + 1,
-                            "start_index": start_index,
-                        },
+                        textwrap.dedent(f"""
+                        Requesting Google CSE page,
+                        query: {self.query},
+                        page: {page + 1},
+                        start_index: {start_index},
+                        """).strip()
                     )
 
                     try:
                         async with session.get(url) as resp:
                             if not (200 <= resp.status < 300):
-                                body = await resp.text()
+                                body = await resp.json()
                                 logger.error(
-                                    f"Google search: unexpected response status: {resp.status}",
-                                    extra={
-                                        "status": resp.status,
-                                        "url": url,
-                                        "query": self.query,
-                                        "page": page + 1,
-                                        "start_index": start_index,
-                                        "body_snippet": body[:300],
-                                    },
+                                    textwrap.dedent(f"""
+                                        Google search: unexpected response status,
+                                        status: {resp.status},
+                                        query: {self.query},
+                                        page: {page + 1},
+                                        start_index: {start_index},
+                                        error: {body.get("error", {})}
+                                        """).strip()
                                 )
                                 return None
                             search_results = await resp.json()
                             if "error" in search_results:
                                 err = search_results.get("error", {})
                                 logger.error(
-                                    "Google CSE API returned error",
-                                    extra={
-                                        "query": self.query,
-                                        "url": url,
-                                        "page": page + 1,
-                                        "start_index": start_index,
-                                        "api_error": err,
-                                    },
+                                    textwrap.dedent(f"""
+                                    Google CSE API returned error,
+                                    query: {self.query},
+                                    page: {page + 1},
+                                    start_index: {start_index},
+                                    api_error: {err},
+                                    """).strip()
                                 )
                                 return None
                     except aiohttp.ClientError as e:
                         logger.exception(
-                            f"Google CSE connection error: {e}",
-                            extra={
-                                "query": self.query,
-                                "url": url,
-                                "page": page + 1,
-                                "start_index": start_index,
-                            },
+                            textwrap.dedent(f"""
+                            Google CSE connection error: {e},
+                            query: {self.query},
+                            page: {page + 1},
+                            start_index: {start_index},
+                            """).strip()
                         )
                         return None
                     except Exception as e:
                         logger.exception(
-                            f"Error retrieving or parsing Google API response: {e}",
-                            extra={
-                                "query": self.query,
-                                "url": url,
-                                "page": page + 1,
-                                "start_index": start_index,
-                            },
+                            textwrap.dedent(f"""
+                            Error retrieving or parsing Google API response: {e},
+                            query: {self.query},
+                            page: {page + 1},
+                            start_index: {start_index},
+                            """).strip()
                         )
                         return None
 
                     items = search_results.get("items", [])
                     if not items:
                         logger.info(
-                            "No more items returned by the API.",
-                            extra={"query": self.query, "page": page + 1},
+                            textwrap.dedent(f"""
+                            No more items returned by the API,
+                            query: {self.query},
+                            page: {page + 1},
+                            """).strip()
                         )
                         break
 
@@ -200,8 +196,11 @@ class GoogleSearch:
                             seen_links.add(link)
                         except Exception as e:
                             logger.exception(
-                                f"Error creating SearchResultEntry: {e}",
-                                extra={"link": link, "title": title},
+                                textwrap.dedent(f"""
+                                Error creating SearchResultEntry: {e},
+                                link: {link},
+                                title: {title},
+                                """).strip()
                             )
                             continue
 
@@ -219,8 +218,10 @@ class GoogleSearch:
                     await asyncio.sleep(0.1)
         except Exception as e:
             logger.exception(
-                f"Unexpected error in Google Custom Search flow. {e}",
-                extra={"query": self.query},
+                textwrap.dedent(f"""
+                Unexpected error in Google Custom Search flow: {e},
+                query: {self.query},
+                """).strip()
             )
             return None
 
