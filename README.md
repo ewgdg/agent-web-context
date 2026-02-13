@@ -53,19 +53,19 @@ For Codex specifically, we recommend the skill-based integration due to a known 
 
 ### Install the skill (for Codex)
 
-Global install:
+Choose an install directory:
+
+- Global: `INSTALL_DIR="${CODEX_HOME:-$HOME/.codex}/skills/agent-web-context"`
+- Project-local: `INSTALL_DIR="/path/to/your/project/.codex/skills/agent-web-context"`
+
+Then install:
 
 ```bash
-mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
-cp -R skills/agent-web-context "${CODEX_HOME:-$HOME/.codex}/skills/"
+mkdir -p "$INSTALL_DIR"
+cp -R skills/agent-web-context/{SKILL.md,agents,scripts} "$INSTALL_DIR/"
 ```
 
-Project-local install:
-
-```bash
-mkdir -p /path/to/your/project/.codex/skills
-cp -R skills/agent-web-context /path/to/your/project/.codex/skills/
-```
+When installing or updating skill files, do not overwrite `<install_dir>/agent-web-context/references/`.
 
 The skill persists the service `base_url` in `<install_dir>/agent-web-context/references/service.json` (created on first use). If `base_url` is missing/empty, the agent should ask you and then save it for next time.
 
