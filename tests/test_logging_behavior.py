@@ -7,7 +7,7 @@ from uuid import uuid4
 # Importing main will initialize logging handlers per your app config
 # - Creates ./logs directory
 # - Adds RotatingFileHandler for ERROR level at ./logs/errors.log
-import src.mcp_web_context.main  # noqa: F401
+import src.agent_web_context.main  # noqa: F401
 
 
 def test_error_logs_are_written_immediately(tmp_path=None):

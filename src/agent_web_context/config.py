@@ -1,5 +1,5 @@
 """
-Configuration management for MCP Web Context.
+Configuration management for Agent Web Context.
 
 Handles loading YAML configuration and providing model fallback logic for agents.
 """

@@ -1,4 +1,4 @@
-from src.mcp_web_context.search import (
+from src.agent_web_context.search import (
     BraveSearch,
     GoogleSearch,
     _parse_brave_web_results,

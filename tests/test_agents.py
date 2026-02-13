@@ -4,13 +4,13 @@ Tests for the agent system.
 
 import pytest
 from unittest.mock import AsyncMock, MagicMock
-from src.mcp_web_context.agents.web_content_analyzer import (
+from src.agent_web_context.agents.web_content_analyzer import (
     WebContentAnalyzer,
     AnalyzeRequest,
     LLMExtraction,
     ExtractedContent,
 )
-from src.mcp_web_context.routers.scraping import ScrapeResult, ScrapeResponse
+from src.agent_web_context.routers.scraping import ScrapeResult, ScrapeResponse
 
 
 class TestWebContentAnalyzer:
@@ -41,7 +41,7 @@ class TestWebContentAnalyzer:
 
         mock_fetch = AsyncMock(return_value=mock_scrape_response)
         mocker.patch(
-            "src.mcp_web_context.agents.web_content_analyzer.fetch_web_content",
+            "src.agent_web_context.agents.web_content_analyzer.fetch_web_content",
             mock_fetch,
         )
 
@@ -97,7 +97,7 @@ class TestWebContentAnalyzer:
 
         # Mock fetch_web_content to raise an exception
         mocker.patch(
-            "src.mcp_web_context.agents.web_content_analyzer.fetch_web_content",
+            "src.agent_web_context.agents.web_content_analyzer.fetch_web_content",
             side_effect=Exception("Network error"),
         )
 

@@ -1,5 +1,5 @@
 services:
-  mcp-web-context:
+  agent-web-context:
     build:
       context: ../..
       dockerfile: container/xorg/Dockerfile

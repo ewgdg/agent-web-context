@@ -1,14 +1,14 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-- Source: `src/mcp_web_context/` (FastAPI app + MCP server).
+- Source: `src/agent_web_context/` (FastAPI app + MCP server).
 - Key modules: `main.py` (entry), `routers/` (API routes), `agents/` (agent logic), `scraper.py` (Patchright browser), `search.py` (Google CSE), `cache.py` (async cache), `config.py` (model/provider settings).
 - Tests: `tests/` (unit/integration) with `test_*.py` files.
 - Logs/Screenshots: `logs/` for runtime traces and capture artifacts.
 
 ## Build, Test, and Development Commands
 - Install deps: `uv sync`
-- Run API: `uv run -- uvicorn 'src.mcp_web_context.main:app' --host=0.0.0.0 --port=8000` (docs at `http://localhost:8000/docs`).
+- Run API: `uv run -- uvicorn 'src.agent_web_context.main:app' --host=0.0.0.0 --port=8000` (docs at `http://localhost:8000/docs`).
 - Run tests: `uv run pytest -q`
 - Lint: `uv run ruff check .`
 - Format: `uv run ruff format .`
@@ -36,4 +36,3 @@
 - Required: `GOOGLE_API_KEY`, `GOOGLE_CX_KEY`; optional: `DATABASE_URL`.
 - Model/provider settings live in `config.yaml` (ordered primary → fallback). Validate credentials before enabling agents.
 - Rate limits and caching are built-in—avoid duplicate fetches; inspect `logs/` for failures/screenshots.
-

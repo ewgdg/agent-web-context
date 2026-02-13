@@ -6,4 +6,4 @@
 echo "Starting FastAPI application..."
 
 # Start the FastAPI application in foreground
-/app/.venv/bin/uvicorn src.mcp_web_context.main:app --host=0.0.0.0 --port=8000
+/app/.venv/bin/uvicorn src.agent_web_context.main:app --host=0.0.0.0 --port=8000

@@ -1,4 +1,4 @@
-# Configuration for MCP Web Context
+# Configuration for Agent Web Context
 # Define model lists for each agent with fallback support
 
 models:

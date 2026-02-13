@@ -808,7 +808,7 @@ wheels = [
 ]
 
 [[package]]
-name = "mcp-web-context"
+name = "agent-web-context"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

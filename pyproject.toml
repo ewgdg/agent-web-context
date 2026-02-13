@@ -1,5 +1,5 @@
 [project]
-name = "mcp-web-context"
+name = "agent-web-context"
 version = "0.1.0"
 description = "MCP server for web browsing, content extraction, and search"
 requires-python = ">=3.13"
@@ -38,4 +38,3 @@ dev = [
     "pytest-mock>=3.14.1",
     "ruff>=0.12.11",
 ]
-

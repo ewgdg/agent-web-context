@@ -4,7 +4,7 @@ Tests for the configuration system.
 
 import pytest
 from pathlib import Path
-from src.mcp_web_context.config import ConfigManager, get_config_manager
+from src.agent_web_context.config import ConfigManager, get_config_manager
 
 
 class TestConfigManager:

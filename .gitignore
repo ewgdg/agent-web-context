@@ -12,3 +12,9 @@ browser_data/
 .env
 .env.*
 !.env.example
+
+# Generated: derived from the running service OpenAPI schema.
+skills/agent-web-context/references/openapi_cache/
+
+# Generated: user-specific base URL for the service.
+skills/agent-web-context/references/service.json

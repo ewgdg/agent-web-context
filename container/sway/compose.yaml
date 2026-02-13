@@ -1,5 +1,5 @@
 services:
-  mcp-web-context:
+  agent-web-context:
     build:
       context: ../..
       dockerfile: container/wayland/Dockerfile
@@ -34,7 +34,7 @@ services:
       - seccomp:unconfined
     # This is needed for any modern website to function like youtube.
     shm_size: "10gb"
-    command: ["uvicorn", "src.mcp_web_context.main:app", "--host=0.0.0.0", "--port=8000"]
+    command: ["uvicorn", "src.agent_web_context.main:app", "--host=0.0.0.0", "--port=8000"]
     # command: sleep infinity
     logging:
       driver: json-file

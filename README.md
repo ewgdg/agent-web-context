@@ -1,6 +1,6 @@
-# MCP Web Context
+# Agent Web Context
 
-A Model Context Protocol (MCP) server for web browsing, content extraction, and search built with FastAPI.
+A web context service for agents: supports MCP plus an HTTP/OpenAPI API for web browsing, content extraction, and search (FastAPI).
 
 ## Features
 
@@ -16,7 +16,7 @@ A Model Context Protocol (MCP) server for web browsing, content extraction, and 
 
 ```bash
 git clone <repository-url>
-cd mcp-web-context
+cd agent-web-context
 cp .env.example .env  # Edit with your API keys
 docker compose up --build
 ```
@@ -30,12 +30,43 @@ docker compose up --build
 ```bash
 uv sync
 cp .env.example .env  # Edit with your API keys
-uv run -- uvicorn 'src.mcp_web_context.main:app' --host=0.0.0.0 --port=8000
+uv run -- uvicorn 'src.agent_web_context.main:app' --host=0.0.0.0 --port=8000
 ```
 
 ```bash
 uv run pre-commit install  # install pre-commit hook
 ```
+
+## Using as an MCP server
+
+Start the service (Docker or local) and connect your MCP-capable client to the MCP endpoint:
+
+- Streamable HTTP transport: `/mcp` (recommended)
+- Legacy SSE transport: `/mcp/sse` + `/mcp/messages` (compat)
+
+## Using from agent skills
+
+This repo ships a general-purpose agent skill at `skills/agent-web-context/` that calls this service over HTTP and discovers operations from the service OpenAPI schema.
+
+For Codex specifically, we recommend the skill-based integration due to a known Codex [limitation](https://github.com/openai/codex/issues/3152).
+
+### Install the skill (for Codex)
+
+Global install:
+
+```bash
+mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
+cp -R skills/agent-web-context "${CODEX_HOME:-$HOME/.codex}/skills/"
+```
+
+Project-local install:
+
+```bash
+mkdir -p /path/to/your/project/.codex/skills
+cp -R skills/agent-web-context /path/to/your/project/.codex/skills/
+```
+
+The skill persists the service `base_url` in `<install_dir>/agent-web-context/references/service.json` (created on first use). If `base_url` is missing/empty, the agent should ask you and then save it for next time.
 
 ## Configuration
 

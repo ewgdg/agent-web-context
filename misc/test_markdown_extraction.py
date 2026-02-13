@@ -15,7 +15,7 @@ import sys
 if not __package__:
     sys.path.append(str(Path(__file__).parent.parent / "src"))
 
-from mcp_web_context.utils import (
+from agent_web_context.utils import (
     get_text_from_soup,
     get_markdown_from_soup,
     clean_soup,
@@ -23,7 +23,7 @@ from mcp_web_context.utils import (
     get_relevant_images,
     extract_title,
 )
-from mcp_web_context.scraper import Scraper
+from agent_web_context.scraper import Scraper
 
 
 async def fetch_html_with_scraper(url: str) -> str:
