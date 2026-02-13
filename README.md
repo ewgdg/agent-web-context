@@ -21,9 +21,10 @@ cp .env.example .env  # Edit with your API keys
 docker compose up --build
 ```
 
-
 - API: <http://localhost:8000>
 - VNC Debug: <https://localhost:6901> (kasm_user/kasm_user)
+
+Docker builds use a cache-friendly layer for browser-related Python deps (Patchright, etc.) via `requirements-browser.txt`. See `docs/docker-browser-layer.md` for details and how it stays up to date.
 
 ### Local Development
 
