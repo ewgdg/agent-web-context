@@ -34,7 +34,7 @@ uv run -- uvicorn 'src.agent_web_context.main:app' --host=0.0.0.0 --port=8000
 ```
 
 ```bash
-uv run pre-commit install  # install pre-commit hook
+uv run --only-dev pre-commit install  # install pre-commit hook
 ```
 
 ## Using as an MCP server
