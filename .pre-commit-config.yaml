@@ -3,7 +3,7 @@ repos:
     hooks:
       - id: update-browser-requirements
         name: Update browser requirements
-        entry: bash -c 'uv export --only-group browser --format requirements-txt --no-dev > requirements-browser.txt && git add requirements-browser.txt'
+        entry: bash -c 'uv export --only-group browser --format requirements-txt --no-dev -o requirements-browser.txt && git add requirements-browser.txt'
         language: system
         files: 'pyproject.toml|uv.lock'
         pass_filenames: false
