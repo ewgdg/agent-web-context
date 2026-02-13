@@ -234,9 +234,9 @@ def format_file_size(size_bytes: float) -> str:
     return f"{size_bytes:.1f} {size_names[i]}"
 
 
-@router.get("")
-@router.get("/")
-@router.get("/{path:path}")
+@router.get("", include_in_schema=False)
+@router.get("/", include_in_schema=False)
+@router.get("/{path:path}", include_in_schema=False)
 async def browse_logs(request: Request, path: str = ""):
     """Browse log files and directories."""
     current_path = LOGS_DIR / path if path else LOGS_DIR
@@ -422,7 +422,7 @@ async def browse_logs(request: Request, path: str = ""):
     return HTMLResponse(content=html_content)
 
 
-@router.delete("/delete/{filepath:path}")
+@router.delete("/delete/{filepath:path}", include_in_schema=False)
 async def delete_file(filepath: str):
     """Delete a specific file."""
     file_path = LOGS_DIR / filepath
@@ -443,7 +443,7 @@ async def delete_file(filepath: str):
     return JSONResponse({"message": f"File deleted successfully"})
 
 
-@router.delete("/delete-folder/{folderpath:path}")
+@router.delete("/delete-folder/{folderpath:path}", include_in_schema=False)
 async def delete_folder(folderpath: str):
     """Delete a folder and all its contents."""
     import shutil
@@ -466,7 +466,7 @@ async def delete_folder(folderpath: str):
     return JSONResponse({"message": f"Folder deleted successfully"})
 
 
-@router.delete("/delete-all")
+@router.delete("/delete-all", include_in_schema=False)
 async def delete_all_items(request: Request):
     """Delete all files and folders in the current directory."""
     import shutil
