@@ -71,6 +71,14 @@ def _write_json(path: Path, payload: object) -> None:
     )
 
 
+def _prune_json_files(directory: Path) -> None:
+    if not directory.exists():
+        return
+    for path in directory.glob("*.json"):
+        if path.is_file():
+            path.unlink()
+
+
 def _normalize_base_url(base_url: str) -> str:
     return base_url.strip().rstrip("/")
 
@@ -299,6 +307,9 @@ def _write_split_files(
     schemas_dir = cache_dir / "components" / "schemas"
     operations_dir.mkdir(parents=True, exist_ok=True)
     schemas_dir.mkdir(parents=True, exist_ok=True)
+    # Prevent stale generated artifacts when operations/components are removed or renamed.
+    _prune_json_files(operations_dir)
+    _prune_json_files(schemas_dir)
 
     if write_full_schema:
         _write_json(cache_dir / "openapi.json", schema)
