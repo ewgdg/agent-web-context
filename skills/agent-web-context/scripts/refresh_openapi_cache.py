@@ -25,6 +25,7 @@ Notes:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import shutil
@@ -109,6 +110,60 @@ def _operation_filename(method: str, path: str, operation_id: str | None) -> str
     return f"{base}.json"
 
 
+def _dedupe_operation_filenames(ops: list[OperationRef]) -> list[OperationRef]:
+    grouped: dict[str, list[OperationRef]] = {}
+    for op in ops:
+        grouped.setdefault(op.filename, []).append(op)
+
+    out: list[OperationRef] = []
+    used: set[str] = set()
+    for filename, group in grouped.items():
+        group_sorted = sorted(
+            group,
+            key=lambda o: (
+                "" if o.operation_id is None else o.operation_id,
+                o.method,
+                o.path,
+            ),
+        )
+        if len(group_sorted) == 1:
+            op = group_sorted[0]
+            out.append(op)
+            used.add(op.filename)
+            continue
+
+        stem = filename[: -len(".json")] if filename.endswith(".json") else filename
+        for idx, op in enumerate(group_sorted):
+            if idx == 0 and op.filename not in used:
+                out.append(op)
+                used.add(op.filename)
+                continue
+
+            digest = hashlib.sha1(
+                f"{op.method}|{op.path}|{op.operation_id or ''}".encode("utf-8"),
+            ).hexdigest()[:8]
+            candidate = f"{stem}_{digest}.json"
+            collision_i = 2
+            while candidate in used:
+                candidate = f"{stem}_{digest}_{collision_i}.json"
+                collision_i += 1
+
+            out.append(
+                OperationRef(
+                    operation_id=op.operation_id,
+                    method=op.method,
+                    path=op.path,
+                    summary=op.summary,
+                    description=op.description,
+                    tags=op.tags,
+                    filename=candidate,
+                )
+            )
+            used.add(candidate)
+
+    return out
+
+
 def _http_get_openapi_json(
     schema_url: str,
     *,
@@ -134,14 +189,20 @@ def _http_get_openapi_json(
     except urllib.error.HTTPError as e:
         if e.code == 304:
             raise
-        raise SystemExit(f"Failed to fetch schema from {schema_url}: HTTP {e.code}") from e
+        raise SystemExit(
+            f"Failed to fetch schema from {schema_url}: HTTP {e.code}"
+        ) from e
     except urllib.error.URLError as e:
         raise SystemExit(f"Failed to fetch schema from {schema_url}: {e}") from e
     except json.JSONDecodeError as e:
-        raise SystemExit(f"Schema response was not valid JSON: {schema_url}: {e}") from e
+        raise SystemExit(
+            f"Schema response was not valid JSON: {schema_url}: {e}"
+        ) from e
 
 
-def _iter_operations(schema: dict[str, Any]) -> list[tuple[str, str, dict[str, Any], dict[str, Any]]]:
+def _iter_operations(
+    schema: dict[str, Any],
+) -> list[tuple[str, str, dict[str, Any], dict[str, Any]]]:
     """
     Yield (path, method, op, path_item) for each operation in schema paths.
     """
@@ -178,7 +239,9 @@ def _compact_index(schema: dict[str, Any]) -> tuple[dict[str, Any], list[Operati
         summary = op.get("summary")
         description = op.get("description")
         tags = op.get("tags") if isinstance(op.get("tags"), list) else []
-        filename = _operation_filename(method, path, operation_id if isinstance(operation_id, str) else None)
+        filename = _operation_filename(
+            method, path, operation_id if isinstance(operation_id, str) else None
+        )
         ops.append(
             OperationRef(
                 operation_id=operation_id if isinstance(operation_id, str) else None,
@@ -191,8 +254,9 @@ def _compact_index(schema: dict[str, Any]) -> tuple[dict[str, Any], list[Operati
             )
         )
 
+    ops_unique = _dedupe_operation_filenames(ops)
     ops_sorted = sorted(
-        ops,
+        ops_unique,
         key=lambda o: (
             "" if o.operation_id is None else o.operation_id,
             o.method,
@@ -287,8 +351,12 @@ def _write_split_files(
         _write_json(operations_dir / op_ref.filename, op_payload)
 
     # Split component schemas for selective reading.
-    components = schema.get("components") if isinstance(schema.get("components"), dict) else {}
-    schemas = components.get("schemas") if isinstance(components.get("schemas"), dict) else {}
+    components = (
+        schema.get("components") if isinstance(schema.get("components"), dict) else {}
+    )
+    schemas = (
+        components.get("schemas") if isinstance(components.get("schemas"), dict) else {}
+    )
     if isinstance(schemas, dict):
         for name, schema_obj in schemas.items():
             if not isinstance(name, str):
@@ -365,7 +433,12 @@ def main(argv: list[str]) -> int:
                 f"Schema not modified (ETag matched), but no cache exists at {cache_dir}"
             ) from e
         meta = previous_meta if isinstance(previous_meta, dict) else {}
-        meta = {**meta, "checked_at": _iso_now(), "base_url": base_url, "schema_url": schema_url}
+        meta = {
+            **meta,
+            "checked_at": _iso_now(),
+            "base_url": base_url,
+            "schema_url": schema_url,
+        }
         _write_json(cache_dir / "meta.json", meta)
         print(f"[ok] schema unchanged (304); cache is up to date: {cache_dir}")
         return 0
