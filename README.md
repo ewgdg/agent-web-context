@@ -45,6 +45,13 @@ Start the service (Docker or local) and connect your MCP-capable client to the M
 - Streamable HTTP transport: `/mcp` (recommended)
 - Legacy SSE transport: `/mcp/sse` + `/mcp/messages` (compat)
 
+This service disables MCP DNS rebinding protection by default (to simplify local use and
+reverse-proxy deployments). To enable and lock it down, configure allow-lists via
+environment variables:
+
+- `MCP_ALLOWED_HOSTS` (comma-separated, e.g. `example.com,example.com:*`)
+- `MCP_ALLOWED_ORIGINS` (comma-separated, optional)
+
 ## Using from agent skills
 
 This repo ships a general-purpose agent skill at `skills/agent-web-context/` that calls this service over HTTP and discovers operations from the service OpenAPI schema.

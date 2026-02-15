@@ -1,7 +1,6 @@
 from contextlib import asynccontextmanager, AsyncExitStack
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from mcp.server.fastmcp import FastMCP
 import logging
 import logging.config
 from logging.handlers import RotatingFileHandler
@@ -12,7 +11,7 @@ from .cache import initialize_cache, shutdown_cache
 from .routers import scraping, search, logs, agent
 from .scraper import scraper_context_manager, Scraper
 from .services import service_locator
-from .mcp_server import create_mcp
+from .mcp_server import create_mcp, create_mcp_asgi_app
 
 
 def setup_logging(config_path: str = "logging.yaml") -> None:
@@ -72,12 +71,7 @@ async def lifespan(app: FastAPI):
 
         # Initialize MCP server lifespans
         logger.info("Initializing MCP server...")
-        await stack.enter_async_context(
-            mcp_streamable_app.router.lifespan_context(mcp_streamable_app)
-        )
-        await stack.enter_async_context(
-            mcp_sse_app.router.lifespan_context(mcp_sse_app)
-        )
+        await stack.enter_async_context(mcp_app.router.lifespan_context(mcp_app))
         logger.info("✅ Lifespan initialization complete")
         yield
         logger.info("🔄 Lifespan shutdown starting...")
@@ -111,10 +105,7 @@ logger = logging.getLogger(__name__)
 # Create MCP server instance (shared builder for all transports)
 mcp = create_mcp(instructions)
 
-# Create the MCP apps that we'll use in both lifespan and mounting
-# Both apps configured to handle requests at root of their respective mount points
-mcp_streamable_app = mcp.streamable_http_app()
-mcp_sse_app = mcp.sse_app()
+mcp_app = create_mcp_asgi_app(mcp)
 
 
 @app.get("/health")
@@ -134,5 +125,4 @@ logger.info("📋 MCP server initialized")
 # Mount both transports for compatibility:
 # - SSE: `/mcp/sse` and `/mcp/messages`
 # - Streamable HTTP: `/mcp`
-app.mount("/mcp", mcp_sse_app)
-app.mount("/", mcp_streamable_app)
+app.mount("/", mcp_app)
