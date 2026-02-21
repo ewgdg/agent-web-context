@@ -60,7 +60,22 @@ For Codex specifically, we recommend the skill-based integration due to a known 
 
 ### Install the skill (for Codex)
 
-Choose an install directory:
+Recommended: use the Agent Skills CLI (`npx skills`) to install/update the skill and place it in the right Codex skills directory automatically.
+
+```bash
+# Project-local install (default for Codex: `.codex/skills/` in this repo)
+npx skills add <owner>/<repo>
+
+# Global install (default for Codex: `~/.codex/skills/`)
+npx skills add <owner>/<repo> -g
+
+# Or install from a local checkout
+npx skills add .
+```
+
+If a repo contains multiple skills, select one explicitly (example: `-s agent-web-context`).
+
+Manual install (no Node.js): choose an install directory:
 
 - Global: `INSTALL_DIR="${CODEX_HOME:-$HOME/.codex}/skills/agent-web-context"`
 - Project-local: `INSTALL_DIR="/path/to/your/project/.codex/skills/agent-web-context"`
